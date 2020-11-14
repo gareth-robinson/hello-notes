@@ -1,0 +1,23 @@
+export default {
+  notes: [
+    {
+      id: '1',
+      title: 'All the films I can remember watching',
+      synopsis: 'Star Trek Star Wars Lord of the Rings probably others',
+      body: '<ul><li>Star Trek</li><li>Star Wars</li><li>Lord of the Rings</li><li>probably others</li></ul>'
+    }, {
+      id: '2',
+      title: 'Groceries',
+      synopsis: 'Fruit Apples Broccoli Carrots Tins & Jars Coconut milk Kidney beans',
+      body: `<p><strong>Fruit &amp; Veg</strong></p>
+<p>Apples</p>
+<p>Broccoli</p>
+<p>Carrots</p>
+<p><br></p>
+<p><strong>Tins &amp; Jars</strong></p>
+<p>Coconut milk</p>
+<p>Kidney beans</p>`
+    }
+  ],
+  deleted: []
+};

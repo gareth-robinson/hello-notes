@@ -1,0 +1,30 @@
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+.note-viewer ul,
+.note-viewer ol {
+  padding: 0 2em;
+  margin: 1em 0;
+  list-style-position: inside;
+}
+.note-viewer ul {
+  list-style: disc;
+  list-style-type: disc;
+}
+.note-viewer ol {
+  list-style: decimal;
+  list-style-type: decimal;
+}
+.note-viewer ul ul,
+.note-viewer ol ul {
+  list-style-type: circle;
+  margin-left: 15px;
+}
+.note-viewer ol ol,
+.note-viewer ul ol {
+  list-style-type: lower-latin;
+  margin-left: 15px;
+}
