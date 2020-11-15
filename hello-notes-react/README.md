@@ -15,3 +15,6 @@ TODO (no particular order)
 8. note search
 9. note classification / tag
 10. enzyme vs. react-testing-library
+11. locale bundle
+12. separate tooltips for time & title in note viewer
+13. 'this note is deleted' message for items in trash

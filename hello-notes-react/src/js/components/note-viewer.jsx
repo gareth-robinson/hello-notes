@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import NoteEditor from './note-editor';
 import textExtractor from '../util/simple-text-extractor';
+import constants from '../constants';
+const { VIEW } = constants;
 
 const titleRef = React.createRef();
-const bodyRef = React.createRef();
 
 const titleArea = props => {
   const { note, isEditing } = props;
@@ -31,6 +32,7 @@ const saveAction = (props, state) => {
   const handleClick = () => {
     const newVersion = {
       id: note.id,
+      date: new Date().getTime(),
       title: titleRef.current.value,
       synopsis: newSynopsis,
       body: newBody
@@ -47,12 +49,9 @@ const saveAction = (props, state) => {
 
 const cancelAction = (props, state) => {
   const { note, cancelEdit } = props;
-  const handleClick = () => {
-    cancelEdit();
-  }
   return (
     <button title="Cancel"
-      onClick={handleClick}>
+      onClick={cancelEdit}>
       <i className="material-icons">clear</i>
     </button>
   );
@@ -72,6 +71,16 @@ const editAction = (props, state) => {
   );
 }
 
+const restoreAction = (props, state) => {
+  const { note, restoreNote } = props;
+  return (
+    <button title="Restore"
+      onClick={restoreNote}>
+      <i className="material-icons">cached</i>
+    </button>
+  );
+}
+
 const NoteViewer = props => {
   const state = useState();
   const { note, deleteNote, isEditing } = props;
@@ -81,7 +90,11 @@ const NoteViewer = props => {
 
   const actions = (
     <>
-      { isEditing ? saveAction(props, state) : editAction(props, state) }
+      { note.deleted
+        ? restoreAction(props, state)
+        : isEditing
+          ? saveAction(props, state)
+          : editAction(props, state) }
       { isEditing ? cancelAction(props, state) : null }
       <button title="Trash"
         onClick={() => deleteNote()}>

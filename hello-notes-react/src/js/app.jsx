@@ -4,16 +4,20 @@ import NoteList from './components/note-list';
 import NoteViewer from './components/note-viewer';
 import uuid from 'uuid';
 import initialState from './initial-state';
+import constants from './constants';
+
 initialState.current = initialState.notes[0];
+const { VIEW } = constants;
 
 const createDraft = () => ({
   id: uuid(),
+  date: new Date().getTime(),
   title: "New note",
   body: ""
 });
 
 function notesReducer(state, action) {
-  const { notes, deleted } = state;
+  const { notes, deletedNotes } = state;
   switch (action.type) {
     case 'addNote':
       const newNote = createDraft();
@@ -22,10 +26,21 @@ function notesReducer(state, action) {
         current: newNote
       };
     case 'deleteNote':
+      let deletedNote = notes.find(x => x.id === state.current.id);
+      deletedNote = {
+        ...deletedNote,
+        deleted: true
+      };
       return {
         notes: notes.filter(x => x.id !== state.current.id),
-        deleted: [notes.find(x => x.id === state.current.id)]
-          .concat(deleted),
+        deletedNotes: [deletedNote].concat(deletedNotes),
+        current: null,
+      };
+    case 'restoreNote':
+      let { deleted, ...restoredNote } = deletedNotes.find(x => x.id === state.current.id);
+      return {
+        notes: [restoredNote].concat(notes),
+        deletedNotes: deletedNotes.filter(x => x.id !== state.current.id),
         current: null,
       };
     case 'replaceNote':
@@ -45,7 +60,7 @@ function notesReducer(state, action) {
       };
     case 'selectNote':
       const current = notes.find(x => x.id === action.id) ||
-        deleted.find(x => x.id === action.id);
+        deletedNotes.find(x => x.id === action.id);
       return {
         ...state,
         current
@@ -57,11 +72,18 @@ function notesReducer(state, action) {
 
 const App = () => {
   const [state, notesDispatch] = useReducer(notesReducer, initialState);
-  const [view, setView] = useState("notes");
+  const [view, setView] = useState(VIEW.ACTIVE);
   const [isEditing, setEditing] = useState(false);
 
+  const selectNote = id => {
+    notesDispatch({type: 'selectNote', id});
+  }
   const deleteNote = () => {
-    notesDispatch({type: 'deleteNote'});
+    if (view === VIEW.DELETED) {
+      // TODO Purge!
+    } else {
+      notesDispatch({type: 'deleteNote'});
+    }
     setEditing(false);
   }
   const addNote = () => {
@@ -75,14 +97,12 @@ const App = () => {
   const cancelEdit = () => {
     setEditing(false);
   }
-  const selectNote = id => {
-    notesDispatch({type: 'selectNote', id});
+  const restoreNote = () => {
+    notesDispatch({type: 'restoreNote'});
   }
-  const currentNotes = view === "deleted"
-    ? state.deleted
+  const currentNotes = view === VIEW.DELETED
+    ? state.deletedNotes
     : state.notes;
-
-  console.log("what???", currentNotes)
 
   return (
     <>
@@ -93,6 +113,7 @@ const App = () => {
       />
       <NoteList
         notes={currentNotes}
+        view={view}
         openNote={id => selectNote(id)}
       />
       <NoteViewer
@@ -101,6 +122,7 @@ const App = () => {
         deleteNote={deleteNote}
         editNote={() => setEditing(true)}
         saveNote={note => saveNote(note)}
+        restoreNote={restoreNote}
         cancelEdit={cancelEdit}
       />
     </>

@@ -1,4 +1,6 @@
 import React from 'react';
+import constants from '../constants';
+const { VIEW } = constants;
 
 const Navigation = props => {
   const {
@@ -16,14 +18,14 @@ const Navigation = props => {
       </button>
       <button
         title="Notes"
-        className={view === "notes" ? "bg-app_light" : ""}
-        onClick={() => onChange("notes")}>
+        className={view === VIEW.ACTIVE ? "bg-app_light" : ""}
+        onClick={() => onChange(VIEW.ACTIVE)}>
         <i className="material-icons">description</i>
       </button>
       <button
         title="Trash"
-        className={view === "deleted" ? "bg-app_light" : ""}
-        onClick={() => onChange("deleted")}>
+        className={view === VIEW.DELETED ? "bg-app_light" : ""}
+        onClick={() => onChange(VIEW.DELETED)}>
         <i className="material-icons">delete</i>
       </button>
     </nav>
