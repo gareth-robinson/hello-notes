@@ -1,3 +1,4 @@
 **/.DS_Store
 hello-notes-react/dist
 hello-notes-react/node_modules
+hello-notes-server-fastify/node_modules
