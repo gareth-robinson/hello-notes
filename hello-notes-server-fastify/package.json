@@ -2,9 +2,10 @@
   "name": "hello-notes-server-fastify",
   "version": "1.0.0",
   "description": "Note taking application server",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "prettier": "node_modules/.bin/prettier --write src/**",
+    "start": "node src/server.js",
     "test": "node_modules/.bin/jest src/**"
   },
   "keywords": [
@@ -15,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "fastify": "^3.8.0",
+    "pino-pretty": "^4.3.0",
     "striptags": "^3.1.1",
     "uuid": "^8.3.1"
   },
