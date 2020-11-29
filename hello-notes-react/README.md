@@ -18,3 +18,6 @@ TODO (no particular order)
 11. locale bundle
 12. separate tooltips for time & title in note viewer
 13. 'this note is deleted' message for items in trash
+14. extract reducer
+15. prettier
+16. highlight seleced list item

@@ -1,69 +1,58 @@
-import React, {useReducer, useState, useEffect} from 'react';
-import Navigation from './components/navigation';
-import NoteList from './components/note-list';
-import NoteViewer from './components/note-viewer';
-import uuid from 'uuid';
-import initialState from './initial-state';
-import constants from './constants';
+import React, { useReducer, useState, useEffect } from "react";
+import Navigation from "./components/navigation";
+import NoteList from "./components/note-list";
+import NoteViewer from "./components/note-viewer";
+import uuid from "uuid";
+import constants from "./constants";
 
-initialState.current = initialState.notes[0];
 const { VIEW } = constants;
 
 const createDraft = () => ({
   id: uuid(),
   date: new Date().getTime(),
   title: "New note",
-  body: ""
+  body: "",
+  isNew: true
 });
 
 function notesReducer(state, action) {
-  const { notes, deletedNotes } = state;
+  const { notes, current } = state;
   switch (action.type) {
-    case 'addNote':
+    case "initialise":
+      return {
+        notes: action.data,
+        current: action.data && action.data[0]
+      };
+    case "createDraft":
       const newNote = createDraft();
       return {
         ...state,
         current: newNote
       };
-    case 'deleteNote':
-      let deletedNote = notes.find(x => x.id === state.current.id);
-      deletedNote = {
-        ...deletedNote,
-        deleted: true
+    case "addNote":
+      const newNotes = [].concat(state.notes).concat(action.data);
+      return {
+        notes: newNotes,
+        current: action.data
       };
+    case "replaceNote":
+      const noteIndex = notes.findIndex(x => x.id === action.data.id);
+      const updatedNotes = [].concat(state.notes);
+      updatedNotes[noteIndex] = action.data;
+      return {
+        ...state,
+        notes: updatedNotes,
+        current: action.data
+      };
+    case "deleteNote":
       return {
         notes: notes.filter(x => x.id !== state.current.id),
-        deletedNotes: [deletedNote].concat(deletedNotes),
-        current: null,
+        current: null
       };
-    case 'restoreNote':
-      let { deleted, ...restoredNote } = deletedNotes.find(x => x.id === state.current.id);
-      return {
-        notes: [restoredNote].concat(notes),
-        deletedNotes: deletedNotes.filter(x => x.id !== state.current.id),
-        current: null,
-      };
-    case 'replaceNote':
-      const noteIndex = notes.findIndex(x => x.id === action.note.id);
-      let newNotes;
-      if (noteIndex < 0) {
-        newNotes = [action.note].concat(notes);
-      } else {
-        newNotes = [action.note]
-          .concat(notes.slice(0, noteIndex))
-          .concat(notes.slice(noteIndex + 1));
-      }
+    case "selectNote":
       return {
         ...state,
-        notes: newNotes,
-        current: action.note
-      };
-    case 'selectNote':
-      const current = notes.find(x => x.id === action.id) ||
-        deletedNotes.find(x => x.id === action.id);
-      return {
-        ...state,
-        current
+        current: notes.find(x => x.id === action.id)
       };
     default:
       return state;
@@ -71,43 +60,105 @@ function notesReducer(state, action) {
 }
 
 const App = () => {
-  const [state, notesDispatch] = useReducer(notesReducer, initialState);
+  const [state, notesDispatch] = useReducer(notesReducer, []);
   const [view, setView] = useState(VIEW.ACTIVE);
   const [isEditing, setEditing] = useState(false);
 
+  useEffect(() => {
+    const opts = {
+      headers: {
+        accept: "application/json"
+      }
+    };
+    fetch(constants.SERVER_ROOT, opts)
+      .then(response => response.json())
+      .then(data => notesDispatch({ type: "initialise", data }));
+  }, []);
+
   const selectNote = id => {
-    notesDispatch({type: 'selectNote', id});
-  }
-  const deleteNote = () => {
-    if (view === VIEW.DELETED) {
-      // TODO Purge!
-    } else {
-      notesDispatch({type: 'deleteNote'});
-    }
-    setEditing(false);
-  }
-  const addNote = () => {
-    notesDispatch({type: 'addNote'});
+    notesDispatch({ type: "selectNote", id });
+  };
+
+  const createDraft = () => {
+    notesDispatch({ type: "createDraft" });
     setEditing(true);
-  }
-  const saveNote = note => {
-    notesDispatch({type: 'replaceNote', note});
+  };
+
+  const createNote = note => {
+    const opts = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(note)
+    };
+    fetch(constants.SERVER_ROOT + `/`, opts)
+      .then(response => response.json())
+      .then(data => notesDispatch({ type: "addNote", data }));
     setEditing(false);
-  }
+  };
+
+  const saveNote = note => {
+    const opts = {
+      method: "PATCH",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(note)
+    };
+    fetch(constants.SERVER_ROOT + `/${note.id}`, opts)
+      .then(response => response.json())
+      .then(data => notesDispatch({ type: "replaceNote", data }));
+    setEditing(false);
+  };
+
+  const deleteNote = () => {
+    const { id, folder } = state.current;
+    if (folder === VIEW.DELETED) {
+      const opts = {
+        method: "DELETE"
+      };
+      setEditing(false);
+      fetch(constants.SERVER_ROOT + `/${id}`, opts).then(() =>
+        notesDispatch({ type: "deleteNote", id })
+      );
+    } else {
+      const opts = {
+        method: "PATCH",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          id,
+          folder: VIEW.DELETED
+        })
+      };
+      setEditing(false);
+      fetch(constants.SERVER_ROOT + `/${id}`, opts)
+        .then(response => response.json())
+        .then(data => notesDispatch({ type: "replaceNote", data }));
+    }
+  };
+
   const cancelEdit = () => {
     setEditing(false);
-  }
+  };
+
   const restoreNote = () => {
-    notesDispatch({type: 'restoreNote'});
-  }
-  const currentNotes = view === VIEW.DELETED
-    ? state.deletedNotes
-    : state.notes;
+    notesDispatch({ type: "restoreNote" });
+  };
+
+  const currentNotes = (state.notes || [])
+    .filter(n => n.folder === view)
+    .sort((a, b) => b.date - a.date);
 
   return (
     <>
       <Navigation
-        newNote={addNote}
+        newNote={createDraft}
         view={view}
         onChange={change => setView(change)}
       />
@@ -121,7 +172,7 @@ const App = () => {
         isEditing={isEditing}
         deleteNote={deleteNote}
         editNote={() => setEditing(true)}
-        saveNote={note => saveNote(note)}
+        saveNote={note => (note.isNew ? saveNote(note) : createNote(note))}
         restoreNote={restoreNote}
         cancelEdit={cancelEdit}
       />

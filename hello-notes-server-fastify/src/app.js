@@ -16,12 +16,13 @@ function noNote(reply, noteId) {
   reply.status(404).send(`No note with id ${noteId} found`);
 }
 
-function sendJson(reply, body) {
-  reply.headers({ "access-control-allow-origin": "*" }).send(body);
-}
-
 function build(opts = {}) {
   const app = fastify(opts);
+  app.addHook('onSend', (request, reply, payload, done) => {
+    reply.headers({ "access-control-allow-origin": "*" });
+    done(null, payload);
+  });
+
   app.options("/*", async (_, reply) => {
     reply
       .headers({
@@ -33,7 +34,7 @@ function build(opts = {}) {
       .send();
   });
 
-  app.get("/", async (_, reply) => sendJson(reply, state));
+  app.get("/", async (_, reply) => state);
 
   app.post("/", async (request, reply) => {
     const { body } = request;
@@ -53,7 +54,7 @@ function build(opts = {}) {
   app.get("/:noteId", async (request, reply) => {
     const { noteId } = request.params;
     const note = state.find(n => n.id === noteId);
-    if (note) {
+    if (!note) {
       return note;
     } else {
       noNote(reply, noteId);
@@ -79,7 +80,7 @@ function build(opts = {}) {
         folder: folder || previousNote.folder
       };
       state[noteIndex] = newNote;
-      sendJson(reply, newNote);
+      return newNote;
     }
   });
 
@@ -93,7 +94,9 @@ function build(opts = {}) {
       state = []
         .concat(state.slice(0, noteIndex))
         .concat(state.slice(noteIndex + 1, state.length));
-      reply.status(204).send();
+      reply
+        .status(204)
+        .send();
     }
   });
 

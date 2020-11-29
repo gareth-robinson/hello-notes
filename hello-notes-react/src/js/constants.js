@@ -1,6 +1,7 @@
 export default {
   VIEW: {
-    ACTIVE: "active",
+    ACTIVE: "notes",
     DELETED: "deleted"
-  }
+  },
+  SERVER_ROOT: "http://localhost:3000"
 };
