@@ -7,30 +7,28 @@ const PopUp = props => {
   }
 
   return (
-    <div className="z-10 absolute border border-gray-400 bg-white inset-1/2 w-dialog" role="dialog" aria-modal="true">
-      <div className="inline-block">
-        <div className="border-b">{title}</div>
-        <div>{text}</div>
-        <div>
-          <span className="flex w-full">
-            <button
-              type="button"
-              className="inline-flex justify-center w-full"
-              onClick={onContinue}
-            >
-              Continue
-            </button>
-          </span>
-          <span className="flex w-full">
-            <button
-              type="button"
-              className="inline-flex justify-center w-full"
-              onClick={onCancel}
-            >
-              Cancel
-            </button>
-          </span>
-        </div>
+    <div className="z-10 absolute border border-gray-400 bg-white centre-dialog top-32 shadow-lg" role="dialog" aria-modal="true">
+      <div className="border-b">{title}</div>
+      <div>{text}</div>
+      <div>
+        <span className="flex w-full">
+          <button
+            type="button"
+            className="inline-flex justify-center w-full"
+            onClick={onContinue}
+          >
+            Continue
+          </button>
+        </span>
+        <span className="flex w-full">
+          <button
+            type="button"
+            className="inline-flex justify-center w-full"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+        </span>
       </div>
     </div>
   );

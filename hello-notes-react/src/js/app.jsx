@@ -148,7 +148,21 @@ const App = () => {
   };
 
   const restoreNote = () => {
-    notesDispatch({ type: "restoreNote" });
+    const { id } = state.current;
+    const opts = {
+      method: "PATCH",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        id,
+        folder: VIEW.ACTIVE
+      })
+    };
+    fetch(constants.SERVER_ROOT + `/${id}`, opts)
+      .then(response => response.json())
+      .then(data => notesDispatch({ type: "replaceNote", data }));
   };
 
   const currentNotes = (state.notes || [])

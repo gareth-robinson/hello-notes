@@ -99,12 +99,13 @@ const NoteViewer = props => {
       setPurge(true);
     } else {
       deleteNote();
+      setPurge(false);
     }
   };
 
   const actions = (
     <>
-      {note.deleted
+      {note.folder === VIEW.DELETED
         ? restoreAction(props, updateState)
         : isEditing
         ? saveAction(props, updateState)
@@ -117,7 +118,7 @@ const NoteViewer = props => {
   );
 
   return (
-    <div className="flex-1 flex flex-col relative">
+    <div className="flex-1 flex flex-col">
       <div className="border-b border-gray-400 flex">
         <div className="flex-grow h-8">{titleArea(props)}</div>
         <div className="actions">{actions}</div>
