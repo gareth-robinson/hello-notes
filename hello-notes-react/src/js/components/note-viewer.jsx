@@ -95,7 +95,7 @@ const NoteViewer = props => {
   }
 
   const deleteAction = () => {
-    if (note.deleted && !purge) {
+    if (note.folder === VIEW.DELETED && !purge) {
       setPurge(true);
     } else {
       deleteNote();

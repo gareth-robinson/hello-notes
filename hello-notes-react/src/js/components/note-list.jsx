@@ -34,7 +34,7 @@ const NoteList = props => {
       <div className="border-b">
         <input name="search" />
       </div>
-      <div className="h-full bg-gray-200 p-1">{notes.map(renderNote)}</div>
+      <div className="h-full bg-gray-100 p-1">{notes.map(renderNote)}</div>
     </div>
   );
 };

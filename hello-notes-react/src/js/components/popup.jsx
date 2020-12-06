@@ -7,9 +7,9 @@ const PopUp = props => {
   }
 
   return (
-    <div className="z-10 absolute" role="dialog" aria-modal="true">
-      <div className="border-b border-gray-400 inline-block">
-        <div className="">{title}</div>
+    <div className="z-10 absolute border border-gray-400 bg-white inset-1/2 w-dialog" role="dialog" aria-modal="true">
+      <div className="inline-block">
+        <div className="border-b">{title}</div>
         <div>{text}</div>
         <div>
           <span className="flex w-full">
