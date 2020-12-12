@@ -5,19 +5,16 @@ Also trying to make use of Tailwind for CSS.
 
 TODO (no particular order)
 
-1. note trash - permanent delete / restore
-2. add 'last edited' dates, using one of the suggested replacements for moment
-3. Fix the element alignment
-4. Padding / margins for note titles & body
-5. note viewing scroll bar in the wrong place
-6. custom tailwind border style?
-7. tailwind production css reduction
-8. note search
-9. note classification / tag
-10. enzyme vs. react-testing-library
-11. locale bundle
-12. separate tooltips for time & title in note viewer
-13. 'this note is deleted' message for items in trash
-14. extract reducer
-15. prettier
-16. highlight seleced list item
+1. add 'last edited' dates, using one of the suggested replacements for moment
+2. Fix element alignment / padding throughout
+3. Padding / margins for note titles & body
+4. custom tailwind border style?
+5. tailwind production css reduction
+6. note search
+7. note classification / tag
+8. enzyme vs. react-testing-library
+9. locale bundle
+10. separate tooltips for time & title in note viewer
+11. 'this note is deleted' message for items in trash
+12. extract reducer
+13. husky / pre-commit prettier

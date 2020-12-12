@@ -178,6 +178,7 @@ const App = () => {
       />
       <NoteList
         notes={currentNotes}
+        selected={state.current}
         view={view}
         openNote={id => selectNote(id)}
       />
