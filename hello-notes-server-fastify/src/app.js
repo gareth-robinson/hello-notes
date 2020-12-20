@@ -9,6 +9,7 @@ let state = [].concat(initialState);
 function makeSynopsis(content) {
   return striptags(content, [], " ")
     .replace(/\s+/g, " ")
+    .trim()
     .substring(0, SYNOPSIS_LENGTH);
 }
 
@@ -18,7 +19,7 @@ function noNote(reply, noteId) {
 
 function build(opts = {}) {
   const app = fastify(opts);
-  app.addHook('onSend', (request, reply, payload, done) => {
+  app.addHook("onSend", (request, reply, payload, done) => {
     reply.headers({ "access-control-allow-origin": "*" });
     done(null, payload);
   });
@@ -38,11 +39,12 @@ function build(opts = {}) {
 
   app.post("/", async (request, reply) => {
     const { body } = request;
-    const { title, content } = body;
+    const { title, content, category } = body;
     const newNote = {
       id: uuid.v4(),
       title,
       content,
+      category,
       synopsis: makeSynopsis(content),
       date: new Date().getTime(),
       folder: "notes"
@@ -54,7 +56,7 @@ function build(opts = {}) {
   app.get("/:noteId", async (request, reply) => {
     const { noteId } = request.params;
     const note = state.find(n => n.id === noteId);
-    if (!note) {
+    if (note) {
       return note;
     } else {
       noNote(reply, noteId);
@@ -64,7 +66,7 @@ function build(opts = {}) {
   app.patch("/:noteId", async (request, reply) => {
     const { body, params } = request;
     const { noteId } = params;
-    const { title, content, folder } = body || {};
+    const { title, content, category, folder } = body || {};
 
     const noteIndex = state.findIndex(n => n.id === noteId);
     if (noteIndex < 0) {
@@ -73,6 +75,7 @@ function build(opts = {}) {
       const previousNote = state[noteIndex];
       const newNote = {
         id: noteId,
+        category: category || previousNote.category,
         title: title || previousNote.title,
         content: content || previousNote.content,
         synopsis: content ? makeSynopsis(content) : previousNote.synopsis,
@@ -94,9 +97,7 @@ function build(opts = {}) {
       state = []
         .concat(state.slice(0, noteIndex))
         .concat(state.slice(noteIndex + 1, state.length));
-      reply
-        .status(204)
-        .send();
+      reply.status(204).send();
     }
   });
 

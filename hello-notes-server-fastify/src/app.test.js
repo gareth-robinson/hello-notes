@@ -26,6 +26,7 @@ test("POST to '/' route creates a new note", async () => {
     method: "POST",
     url: "/",
     body: {
+      category: "testCategory",
       title: "testTitle",
       content: "testContent"
     }
@@ -33,6 +34,7 @@ test("POST to '/' route creates a new note", async () => {
   expect(createNoteResponse.statusCode).toBe(200);
   const {
     id,
+    category,
     title,
     content,
     synopsis,
@@ -40,6 +42,7 @@ test("POST to '/' route creates a new note", async () => {
     folder
   } = createNoteResponse.json();
   expect(id).toBe("fake-uuid-create");
+  expect(category).toBe("testCategory");
   expect(title).toBe("testTitle");
   expect(content).toBe("testContent");
   expect(synopsis).toBe("stripped");
@@ -65,6 +68,7 @@ test("GET with note id returns note", async () => {
     method: "POST",
     url: "/",
     body: {
+      category: "testCategory",
       title: "testTitle",
       content: "testContent"
     }
@@ -76,8 +80,17 @@ test("GET with note id returns note", async () => {
     url: "/" + createdId
   });
   expect(getNoteResponse.statusCode).toBe(200);
-  const { id, title, content, synopsis, date, folder } = getNoteResponse.json();
+  const {
+    id,
+    category,
+    title,
+    content,
+    synopsis,
+    date,
+    folder
+  } = getNoteResponse.json();
   expect(id).toBe(createdId);
+  expect(category).toBe("testCategory");
   expect(title).toBe("testTitle");
   expect(content).toBe("testContent");
   expect(synopsis).toBe("stripped");
@@ -102,6 +115,7 @@ test("PATCH update to folder adjusts date, retains other fields", async () => {
     method: "POST",
     url: "/",
     body: {
+      category: "testCategory",
       title: "testTitle",
       content: "testContent"
     }
@@ -116,12 +130,14 @@ test("PATCH update to folder adjusts date, retains other fields", async () => {
     }
   });
   const {
+    category,
     title,
     content,
     synopsis,
     folder,
     date: updatedDate
   } = updateNoteResponse.json();
+  expect(category).toBe("testCategory");
   expect(title).toBe("testTitle");
   expect(content).toBe("testContent");
   expect(synopsis).toBe("testContent");
@@ -136,6 +152,7 @@ test("PATCH update to title, content adjusts date, retains other fields", async 
     method: "POST",
     url: "/",
     body: {
+      category: "testCategory",
       title: "testTitle",
       content: "testContent"
     }
@@ -146,17 +163,20 @@ test("PATCH update to title, content adjusts date, retains other fields", async 
     method: "PATCH",
     url: "/" + id,
     body: {
+      category: "testCategory2",
       title: "testTitle2",
       content: "testContent2"
     }
   });
   const {
+    category,
     title,
     content,
     synopsis,
     folder,
     date: updatedDate
   } = updateNoteResponse.json();
+  expect(category).toBe("testCategory2");
   expect(title).toBe("testTitle2");
   expect(content).toBe("testContent2");
   expect(synopsis).toBe("testContent2");

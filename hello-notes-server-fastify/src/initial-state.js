@@ -14,6 +14,7 @@ module.exports = [
   },
   {
     id: "2",
+    category: "red",
     date: 1605425013256,
     title: "Groceries",
     synopsis:
@@ -30,6 +31,7 @@ module.exports = [
   },
   {
     id: "3",
+    category: "blue",
     date: 1605325013256,
     title: "Meh",
     synopsis: "Nothing of note here",
