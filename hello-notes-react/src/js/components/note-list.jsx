@@ -5,13 +5,19 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 const { VIEW } = constants;
+const borderStyles = {
+  red: "border-red-400",
+  green: "border-green-400",
+  blue: "border-blue-400"
+};
 
 const NoteList = props => {
   const { notes = [], view, openNote, selected } = props;
 
   function renderNote(note) {
-    const { id, title, synopsis, date } = note;
+    const { id, title, synopsis, date, category } = note;
     const border = selected.id === id ? "border-green-300" : "border-gray-400";
+    const categoryBorder = borderStyles[category] || "border-white";
 
     return (
       <a
@@ -22,7 +28,9 @@ const NoteList = props => {
         onClick={() => openNote(id)}
       >
         <div className={`bg-white border rounded-sm p-1 ${border}`}>
-          <div className="h-8 truncate">{title}</div>
+          <div className={`h-8 truncate border-b-2 ${categoryBorder}`}>
+            {title}
+          </div>
           <div className="text-xs">{synopsis}</div>
           <div className="text-xs">{dayjs(date).fromNow()}</div>
         </div>

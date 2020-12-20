@@ -17,6 +17,7 @@ const createDraft = () => ({
 
 function notesReducer(state, action) {
   const { notes, current } = state;
+  console.log("NOTES REDUCER ACTION", action);
   switch (action.type) {
     case "initialise":
       return {
@@ -187,7 +188,9 @@ const App = () => {
         isEditing={isEditing}
         deleteNote={deleteNote}
         editNote={() => setEditing(true)}
-        saveNote={note => (note.isNew ? saveNote(note) : createNote(note))}
+        saveNote={note => {
+          note.isNew ? createNote(note) : saveNote(note);
+        }}
         restoreNote={restoreNote}
         cancelEdit={cancelEdit}
       />

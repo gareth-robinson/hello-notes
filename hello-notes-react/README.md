@@ -18,3 +18,5 @@ TODO (no particular order)
 11. 'this note is deleted' message for items in trash
 12. extract reducer
 13. husky / pre-commit prettier
+14. Change API id to URI
+15. Make note entries consistent height

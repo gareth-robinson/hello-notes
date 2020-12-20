@@ -1,10 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
+import cloneDeep from "clone-deep";
+import CategoryChooser from "./category-chooser";
+import CategoryIcon from "./category-icon";
 import NoteEditor from "./note-editor";
 import PopUp from "./popup";
 import constants from "../constants";
 const { VIEW } = constants;
 
 const titleRef = React.createRef();
+
+function noteReducer(state, action) {
+  switch (action.type) {
+    case "initialise":
+      return action.data ? cloneDeep(action.data) : {};
+    case "setBody":
+      return {
+        ...state,
+        content: action.data
+      };
+    case "setCategory":
+      return {
+        ...state,
+        category: action.data
+      };
+    case "setTitle":
+      return {
+        ...state,
+        title: action.data
+      };
+    default:
+      return state;
+  }
+}
 
 const titleArea = props => {
   const { note, isEditing } = props;
@@ -20,27 +47,31 @@ const titleArea = props => {
   );
 };
 
-const bodyArea = (props, state) => {
-  const { note, isEditing, setNewBody } = props;
-  const [content, setContent] = state;
+const bodyArea = (props, state, noteDispatch) => {
+  const { isEditing, setNewBody } = props;
   return isEditing ? (
-    <NoteEditor body={content} setBody={setContent} />
+    <NoteEditor
+      key={state.id}
+      body={state.content}
+      setBody={b => noteDispatch({ type: "setBody", data: b })}
+    />
   ) : (
     <div
       className="note-viewer text-xs"
-      dangerouslySetInnerHTML={{ __html: note.content }}
+      dangerouslySetInnerHTML={{ __html: state.content }}
     />
   );
 };
 
 const saveAction = (props, state) => {
   const { note, saveNote } = props;
-  const [newBody] = state;
   const handleClick = () => {
     const newVersion = {
       id: note.id,
       title: titleRef.current.value,
-      content: newBody
+      content: state.content,
+      category: state.category,
+      isNew: state.isNew
     };
     saveNote(newVersion);
   };
@@ -51,7 +82,7 @@ const saveAction = (props, state) => {
   );
 };
 
-const cancelAction = (props, state) => {
+const cancelAction = props => {
   const { note, cancelEdit } = props;
   return (
     <button title="Cancel" onClick={cancelEdit}>
@@ -60,23 +91,16 @@ const cancelAction = (props, state) => {
   );
 };
 
-const editAction = (props, state) => {
+const editAction = props => {
   const { note, editNote } = props;
-  const [, setBody] = state;
   return (
-    <button
-      title="Edit"
-      onClick={() => {
-        setBody(note.content);
-        editNote();
-      }}
-    >
+    <button title="Edit" onClick={editNote}>
       <i className="material-icons">edit</i>
     </button>
   );
 };
 
-const restoreAction = (props, state) => {
+const restoreAction = props => {
   const { note, restoreNote } = props;
   return (
     <button title="Restore" onClick={restoreNote}>
@@ -86,10 +110,15 @@ const restoreAction = (props, state) => {
 };
 
 const NoteViewer = props => {
-  const updateState = useState();
+  const [state, noteDispatch] = useReducer(noteReducer, {});
   const purgeState = useState(false);
   const [purge, setPurge] = purgeState;
   const { note, deleteNote, isEditing } = props;
+
+  useEffect(() => {
+    noteDispatch({ type: "initialise", data: note });
+  }, [note && note.id]);
+
   if (!note || !note.id) {
     return <div className="flex-1"></div>;
   }
@@ -103,14 +132,23 @@ const NoteViewer = props => {
     }
   };
 
+  const { category } = state || {};
   const actions = (
     <>
-      {note.folder === VIEW.DELETED
-        ? restoreAction(props, updateState)
+      {isEditing ? (
+        <CategoryChooser
+          category={category}
+          onChange={c => noteDispatch({ type: "setCategory", data: c })}
+        />
+      ) : (
+        <CategoryIcon category={category} />
+      )}
+      {state.folder === VIEW.DELETED
+        ? restoreAction(props)
         : isEditing
-        ? saveAction(props, updateState)
-        : editAction(props, updateState)}
-      {isEditing ? cancelAction(props, updateState) : null}
+        ? saveAction(props, state)
+        : editAction(props)}
+      {isEditing ? cancelAction(props) : null}
       <button title="Trash" onClick={deleteAction}>
         <i className="material-icons">delete</i>
       </button>
@@ -123,7 +161,7 @@ const NoteViewer = props => {
         <div className="flex-grow h-8">{titleArea(props)}</div>
         <div className="actions">{actions}</div>
       </div>
-      <div className="flex-1">{bodyArea(props, updateState)}</div>
+      <div className="flex-1">{bodyArea(props, state, noteDispatch)}</div>
       <PopUp
         visible={purge}
         title="Delete note"
