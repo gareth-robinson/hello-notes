@@ -1,16 +1,15 @@
 const fastify = require("fastify");
 const uuid = require("uuid");
 const striptags = require("striptags");
+const { unescape } = require("html-escaper");
 const initialState = require("./initial-state");
 const { PORT, SYNOPSIS_LENGTH } = require("./constants");
 
 let state = [].concat(initialState);
 
 function makeSynopsis(content) {
-  return striptags(content, [], " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .substring(0, SYNOPSIS_LENGTH);
+  const stripped = striptags(content, [], " ").replace(/\s+/g, " ").trim();
+  return unescape(stripped).substring(0, SYNOPSIS_LENGTH);
 }
 
 function noNote(reply, noteId) {
