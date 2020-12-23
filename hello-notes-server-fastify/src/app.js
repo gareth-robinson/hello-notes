@@ -66,6 +66,7 @@ function build(opts = {}) {
     const { body, params } = request;
     const { noteId } = params;
     const { title, content, category, folder } = body || {};
+    const hasCategory = body.hasOwnProperty('category');
 
     const noteIndex = state.findIndex(n => n.id === noteId);
     if (noteIndex < 0) {
@@ -74,7 +75,7 @@ function build(opts = {}) {
       const previousNote = state[noteIndex];
       const newNote = {
         id: noteId,
-        category: category || previousNote.category,
+        category: hasCategory ? category : previousNote.category,
         title: title || previousNote.title,
         content: content || previousNote.content,
         synopsis: content ? makeSynopsis(content) : previousNote.synopsis,
