@@ -5,10 +5,10 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 const { VIEW } = constants;
-const borderStyles = {
-  red: "border-red-400",
-  green: "border-green-400",
-  blue: "border-blue-400"
+const categoryStyles = {
+  red: "bg-red-400",
+  green: "bg-green-400",
+  blue: "bg-blue-400"
 };
 
 const NoteList = props => {
@@ -17,7 +17,8 @@ const NoteList = props => {
   function renderNote(note) {
     const { id, title, synopsis, date, category } = note;
     const border = selected.id === id ? "border-green-300" : "border-gray-400";
-    const categoryBorder = borderStyles[category] || "border-white";
+    const categoryStyle = categoryStyles[category] || "bg-white";
+    const day = dayjs(date);
 
     return (
       <a
@@ -27,12 +28,20 @@ const NoteList = props => {
         title={title}
         onClick={() => openNote(id)}
       >
-        <div className={`bg-white border rounded-sm p-1 ${border}`}>
-          <div className={`h-8 truncate border-b-2 ${categoryBorder}`}>
-            {title}
+        <div
+          className={`bg-white border rounded-sm ${border} cursor-pointer flex`}
+        >
+          <div className={`w-2 ${categoryStyle}`}></div>
+          <div className="w-full_minus2 p-1">
+            <div className="pb-1 truncate">{title}</div>
+            <div className="text-xs h-8 overflow-hidden">{synopsis}</div>
+            <div
+              className="pt-1 text-xs text-right"
+              title={day.format("DD/MM/YYYY HH:mm:ss")}
+            >
+              {day.fromNow()}
+            </div>
           </div>
-          <div className="text-xs">{synopsis}</div>
-          <div className="text-xs">{dayjs(date).fromNow()}</div>
         </div>
       </a>
     );
