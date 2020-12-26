@@ -5,15 +5,30 @@ const { unescape } = require("html-escaper");
 const initialState = require("./initial-state");
 const { PORT, SYNOPSIS_LENGTH } = require("./constants");
 
-let state = [].concat(initialState);
+let state = initialState.map(x => ({
+  ...x,
+  ...calculatedFields(x)
+}));
 
-function makeSynopsis(content) {
-  const stripped = striptags(content, [], " ").replace(/\s+/g, " ").trim();
-  return unescape(stripped).substring(0, SYNOPSIS_LENGTH);
+function calculatedFields(note) {
+  const { content = "", title = "" } = note;
+  const cleanedContent = unescape(striptags(content, [], " ").replace(/\s+/g, " ").trim());
+  return {
+    synopsis: cleanedContent.substring(0, SYNOPSIS_LENGTH),
+    searchIndex: (`${title} ${cleanedContent}`).toLowerCase()
+  }
 }
 
 function noNote(reply, noteId) {
   reply.status(404).send(`No note with id ${noteId} found`);
+}
+
+function wrapped(note) {
+  return {
+    "@id": `http://localhost:${PORT}/${note.id}`,
+    ...note,
+    searchIndex: undefined
+  }
 }
 
 function build(opts = {}) {
@@ -34,7 +49,21 @@ function build(opts = {}) {
       .send();
   });
 
-  app.get("/", async (_, reply) => state);
+  app.get("/", async (request, reply) => {
+    const { query } = request;
+    const { search } = query;
+    if (!search) {
+      return state.map(wrapped);
+    }
+    // very basic search implementation
+    const words = search
+      .split(" ")
+      .map(x => x.trim().toLowerCase())
+      .filter(x => x);
+    return state
+      .filter(x => words.every(w => x.searchIndex.includes(w)))
+      .map(wrapped);
+  });
 
   app.post("/", async (request, reply) => {
     const { body } = request;
@@ -44,9 +73,9 @@ function build(opts = {}) {
       title,
       content,
       category,
-      synopsis: makeSynopsis(content),
       date: new Date().getTime(),
-      folder: "notes"
+      folder: "notes",
+      ...calculatedFields({ title, content })
     };
     state = [newNote].concat(state);
     return newNote;
@@ -56,7 +85,7 @@ function build(opts = {}) {
     const { noteId } = request.params;
     const note = state.find(n => n.id === noteId);
     if (note) {
-      return note;
+      return wrapped(note);
     } else {
       noNote(reply, noteId);
     }
@@ -65,25 +94,28 @@ function build(opts = {}) {
   app.patch("/:noteId", async (request, reply) => {
     const { body, params } = request;
     const { noteId } = params;
-    const { title, content, category, folder } = body || {};
-    const hasCategory = body.hasOwnProperty('category');
 
     const noteIndex = state.findIndex(n => n.id === noteId);
     if (noteIndex < 0) {
       noNote(reply, noteId);
     } else {
+      const { title, content, category, folder } = body || {};
+      const hasCategory = body.hasOwnProperty('category');
       const previousNote = state[noteIndex];
+      const additional = content
+        ? calculatedFields({ title, content })
+        : { synopsis: previousNote.synopsis, searchIndex: previousNote.searchIndex };
       const newNote = {
         id: noteId,
         category: hasCategory ? category : previousNote.category,
         title: title || previousNote.title,
         content: content || previousNote.content,
-        synopsis: content ? makeSynopsis(content) : previousNote.synopsis,
         date: new Date().getTime(),
-        folder: folder || previousNote.folder
+        folder: folder || previousNote.folder,
+        ...additional
       };
       state[noteIndex] = newNote;
-      return newNote;
+      return wrapped(newNote);
     }
   });
 

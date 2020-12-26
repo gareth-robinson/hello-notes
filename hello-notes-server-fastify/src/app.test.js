@@ -1,10 +1,7 @@
 const build = require("./app");
 const initialState = require("./initial-state");
 const uuid = require("uuid");
-const striptags = require("striptags");
-
 jest.mock("uuid");
-jest.mock("striptags");
 
 test("initial state is returned when GET the '/' route", async () => {
   const app = build();
@@ -16,9 +13,28 @@ test("initial state is returned when GET the '/' route", async () => {
   expect(allDataResponse.json().length).toBe(3);
 });
 
+test("search matches note containing the text", async () => {
+  const app = build();
+  const allDataResponse = await app.inject({
+    method: "GET",
+    url: "/?search=OF"
+  });
+  expect(allDataResponse.statusCode).toBe(200);
+  expect(allDataResponse.json().length).toBe(2);
+});
+
+test("search matches note containing all words in the text", async () => {
+  const app = build();
+  const allDataResponse = await app.inject({
+    method: "GET",
+    url: "/?search=Star of films"
+  });
+  expect(allDataResponse.statusCode).toBe(200);
+  expect(allDataResponse.json().length).toBe(1);
+});
+
 test("POST to '/' route creates a new note", async () => {
   uuid.v4.mockImplementation(() => "fake-uuid-create");
-  striptags.mockImplementation(() => "stripped");
   const app = build();
   const beforeTest = new Date().getTime();
 
@@ -28,7 +44,7 @@ test("POST to '/' route creates a new note", async () => {
     body: {
       category: "testCategory",
       title: "testTitle",
-      content: "testContent"
+      content: "testContent  unescape &amp; test <b>strip</b>"
     }
   });
   expect(createNoteResponse.statusCode).toBe(200);
@@ -38,14 +54,16 @@ test("POST to '/' route creates a new note", async () => {
     title,
     content,
     synopsis,
+    searchIndex,
     date,
     folder
   } = createNoteResponse.json();
   expect(id).toBe("fake-uuid-create");
   expect(category).toBe("testCategory");
   expect(title).toBe("testTitle");
-  expect(content).toBe("testContent");
-  expect(synopsis).toBe("stripped");
+  expect(content).toBe("testContent  unescape &amp; test <b>strip</b>");
+  expect(synopsis).toBe("testContent unescape & test strip");
+  expect(searchIndex).toBe("testtitle testcontent unescape & test strip");
   expect(date).toBeGreaterThan(beforeTest);
   expect(folder).toBe("notes");
 
@@ -60,9 +78,7 @@ test("POST to '/' route creates a new note", async () => {
 
 test("GET with note id returns note", async () => {
   uuid.v4.mockImplementation(() => "fake-uuid-get");
-  striptags.mockImplementation(() => "stripped");
   const app = build();
-  const beforeTest = new Date().getTime();
 
   const createNoteResponse = await app.inject({
     method: "POST",
@@ -85,7 +101,6 @@ test("GET with note id returns note", async () => {
     category,
     title,
     content,
-    synopsis,
     date,
     folder
   } = getNoteResponse.json();
@@ -93,9 +108,6 @@ test("GET with note id returns note", async () => {
   expect(category).toBe("testCategory");
   expect(title).toBe("testTitle");
   expect(content).toBe("testContent");
-  expect(synopsis).toBe("stripped");
-  expect(date).toBeGreaterThan(beforeTest);
-  expect(folder).toBe("notes");
 });
 
 test("GET with invalid note id returns 404", async () => {
@@ -109,7 +121,6 @@ test("GET with invalid note id returns 404", async () => {
 });
 
 test("PATCH update to folder adjusts date, retains other fields", async () => {
-  striptags.mockImplementation(x => x);
   const app = build();
   const createNoteResponse = await app.inject({
     method: "POST",
@@ -146,7 +157,6 @@ test("PATCH update to folder adjusts date, retains other fields", async () => {
 });
 
 test("PATCH update to title, content adjusts date, retains other fields", async () => {
-  striptags.mockImplementation(x => x);
   const app = build();
   const createNoteResponse = await app.inject({
     method: "POST",
