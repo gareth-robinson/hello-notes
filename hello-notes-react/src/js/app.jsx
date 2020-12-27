@@ -2,79 +2,20 @@ import React, { useReducer, useState, useEffect } from "react";
 import Navigation from "./components/navigation";
 import NoteList from "./components/note-list";
 import NoteViewer from "./components/note-viewer";
-import uuid from "uuid";
+import appReducer from "./app-reducer";
 import constants from "./constants";
+import initialise from "./actions/initialise";
 
 const { VIEW } = constants;
 
-const createDraft = () => ({
-  id: uuid(),
-  date: new Date().getTime(),
-  title: "New note",
-  body: "",
-  isNew: true
-});
-
-function notesReducer(state, action) {
-  const { notes, current } = state;
-  console.log("NOTES REDUCER ACTION", action);
-  switch (action.type) {
-    case "initialise":
-      return {
-        notes: action.data,
-        current: action.data && action.data[0]
-      };
-    case "createDraft":
-      const newNote = createDraft();
-      return {
-        ...state,
-        current: newNote
-      };
-    case "addNote":
-      const newNotes = [].concat(state.notes).concat(action.data);
-      return {
-        notes: newNotes,
-        current: action.data
-      };
-    case "replaceNote":
-      const noteIndex = notes.findIndex(x => x.id === action.data.id);
-      const updatedNotes = [].concat(state.notes);
-      updatedNotes[noteIndex] = action.data;
-      return {
-        ...state,
-        notes: updatedNotes,
-        current: action.data
-      };
-    case "deleteNote":
-      return {
-        notes: notes.filter(x => x.id !== state.current.id),
-        current: null
-      };
-    case "selectNote":
-      return {
-        ...state,
-        current: notes.find(x => x.id === action.id)
-      };
-    default:
-      return state;
-  }
-}
-
 const App = () => {
-  const [state, notesDispatch] = useReducer(notesReducer, []);
+  const [state, notesDispatch] = useReducer(appReducer, []);
   const [searchState, setSearchState] = useState(false);
   const [view, setView] = useState(VIEW.ACTIVE);
   const [isEditing, setEditing] = useState(false);
 
   useEffect(() => {
-    const opts = {
-      headers: {
-        accept: "application/json"
-      }
-    };
-    fetch(constants.SERVER_ROOT, opts)
-      .then(response => response.json())
-      .then(data => notesDispatch({ type: "initialise", data }));
+    initialise(data => notesDispatch({ type: "initialise", data }))
   }, []);
 
   const selectNote = id => {
