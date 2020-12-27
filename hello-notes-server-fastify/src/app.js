@@ -12,11 +12,13 @@ let state = initialState.map(x => ({
 
 function calculatedFields(note) {
   const { content = "", title = "" } = note;
-  const cleanedContent = unescape(striptags(content, [], " ").replace(/\s+/g, " ").trim());
+  const cleanedContent = unescape(
+    striptags(content, [], " ").replace(/\s+/g, " ").trim()
+  );
   return {
     synopsis: cleanedContent.substring(0, SYNOPSIS_LENGTH),
-    searchIndex: (`${title} ${cleanedContent}`).toLowerCase()
-  }
+    searchIndex: `${title} ${cleanedContent}`.toLowerCase()
+  };
 }
 
 function noNote(reply, noteId) {
@@ -28,7 +30,7 @@ function wrapped(note) {
     "@id": `http://localhost:${PORT}/${note.id}`,
     ...note,
     searchIndex: undefined
-  }
+  };
 }
 
 function build(opts = {}) {
@@ -100,11 +102,14 @@ function build(opts = {}) {
       noNote(reply, noteId);
     } else {
       const { title, content, category, folder } = body || {};
-      const hasCategory = body.hasOwnProperty('category');
+      const hasCategory = body.hasOwnProperty("category");
       const previousNote = state[noteIndex];
       const additional = content
         ? calculatedFields({ title, content })
-        : { synopsis: previousNote.synopsis, searchIndex: previousNote.searchIndex };
+        : {
+            synopsis: previousNote.synopsis,
+            searchIndex: previousNote.searchIndex
+          };
       const newNote = {
         id: noteId,
         category: hasCategory ? category : previousNote.category,

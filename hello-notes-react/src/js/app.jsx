@@ -62,6 +62,7 @@ function notesReducer(state, action) {
 
 const App = () => {
   const [state, notesDispatch] = useReducer(notesReducer, []);
+  const [searchState, setSearchState] = useState(false);
   const [view, setView] = useState(VIEW.ACTIVE);
   const [isEditing, setEditing] = useState(false);
 
@@ -166,6 +167,21 @@ const App = () => {
       .then(data => notesDispatch({ type: "replaceNote", data }));
   };
 
+  const performSearch = query => {
+    const opts = {
+      headers: {
+        accept: "application/json"
+      }
+    };
+    fetch(constants.SERVER_ROOT + `/?search=${encodeURIComponent(query)}`, opts)
+      .then(response => response.json())
+      .then(data => setSearchState(data));
+  }
+
+  const clearSearch = () => {
+    setSearchState(false);
+  }
+
   const currentNotes = (state.notes || [])
     .filter(n => n.folder === view)
     .sort((a, b) => b.date - a.date);
@@ -178,10 +194,12 @@ const App = () => {
         onChange={change => setView(change)}
       />
       <NoteList
-        notes={currentNotes}
+        notes={searchState || currentNotes}
         selected={state.current}
         view={view}
         openNote={id => selectNote(id)}
+        performSearch={performSearch}
+        clearSearch={clearSearch}
       />
       <NoteViewer
         note={state.current}

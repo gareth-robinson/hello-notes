@@ -96,14 +96,7 @@ test("GET with note id returns note", async () => {
     url: "/" + createdId
   });
   expect(getNoteResponse.statusCode).toBe(200);
-  const {
-    id,
-    category,
-    title,
-    content,
-    date,
-    folder
-  } = getNoteResponse.json();
+  const { id, category, title, content, date, folder } = getNoteResponse.json();
   expect(id).toBe(createdId);
   expect(category).toBe("testCategory");
   expect(title).toBe("testTitle");
