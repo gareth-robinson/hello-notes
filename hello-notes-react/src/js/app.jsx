@@ -3,7 +3,6 @@ import Navigation from "./components/navigation";
 import NoteList from "./components/note-list";
 import NoteViewer from "./components/note-viewer";
 import appReducer from "./app-reducer";
-import searchReducer from "./search-reducer";
 import constants from "./constants";
 import initialise from "./actions/initialise";
 

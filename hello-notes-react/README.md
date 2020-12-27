@@ -8,14 +8,14 @@ TODO (no particular order)
 1. Fix element alignment / padding throughout
 2. custom tailwind border style?
 3. tailwind production css reduction
-4. note search <--
-5. enzyme vs. react-testing-library
-6. locale bundle
-7. 'this note is deleted' message for items in trash <--
-8. extract reducers / extract actions
-9. husky / pre-commit prettier
-10. Change API id to URI
-11. Category editor / categories from API
-12. Responsive UI
-13. History API
-14. No note selected
+4. enzyme vs. react-testing-library
+5. locale bundle
+6. 'this note is deleted' message for items in trash <--
+7. extract reducers / extract actions
+8. husky / pre-commit prettier
+9. Change API id to URI
+10. Category editor / categories from API
+11. Responsive UI
+12. History API
+13. No note selected
+14. Fix quill editor styling && size (inner scroll) <--

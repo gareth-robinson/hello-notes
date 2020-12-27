@@ -33,3 +33,11 @@
   list-style-type: lower-latin;
   margin-left: 15px;
 }
+
+/* Overriding quill styles */
+.ql-toolbar.ql-snow {
+  border-width: 0 0 1px 0 !important;
+}
+.ql-container.ql-snow {
+  border-width: 0 !important;
+}
