@@ -175,11 +175,15 @@ const App = () => {
     };
     fetch(constants.SERVER_ROOT + `/?search=${encodeURIComponent(query)}`, opts)
       .then(response => response.json())
-      .then(data => setSearchState(data));
+      .then(data => {
+        setSearchState(data);
+        setView(VIEW.SEARCH);
+      });
   }
 
   const clearSearch = () => {
     setSearchState(false);
+    setView(VIEW.ACTIVE);
   }
 
   const currentNotes = (state.notes || [])
@@ -191,7 +195,10 @@ const App = () => {
       <Navigation
         newNote={createDraft}
         view={view}
-        onChange={change => setView(change)}
+        onChange={change => {
+          setSearchState(false);
+          setView(change);
+        }}
       />
       <NoteList
         notes={searchState || currentNotes}

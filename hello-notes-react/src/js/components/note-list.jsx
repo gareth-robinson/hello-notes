@@ -11,6 +11,11 @@ const categoryStyles = {
   green: "bg-green-400",
   blue: "bg-blue-400"
 };
+const titles = {
+  [VIEW.ACTIVE]: "Notes",
+  [VIEW.DELETED]: "Deleted",
+  [VIEW.SEARCH]: "Search Results"
+}
 
 const NoteList = props => {
   const { notes = [], view, openNote, selected, performSearch, clearSearch } = props;
@@ -50,9 +55,7 @@ const NoteList = props => {
 
   return (
     <div className="w-64 border-r border-gray-400 flex flex-col bg-gray-100">
-      <div className="border-b h-8 p-1 bg-white">
-        {view === VIEW.ACTIVE ? "Notes" : "Deleted"}
-      </div>
+      <div className="border-b h-8 p-1 bg-white">{titles[view]}</div>
       <SearchBar
         performSearch={performSearch}
         clearSearch={clearSearch}/>
