@@ -40,6 +40,7 @@ const titleArea = props => {
       type="text"
       ref={titleRef}
       defaultValue={note.title}
+      placeholder="Note title"
       className="w-full border border-green-300"
     />
   ) : (

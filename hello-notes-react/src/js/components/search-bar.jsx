@@ -1,30 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const SearchBar = props => {
-  const { performSearch, clearSearch } = props;
-  const [hasSearch, setHasSearch] = useState(false);
+  const { hasSearch, performSearch, clearSearch } = props;
   const [query, setQuery] = useState("");
   const canSearch = query.trim().length > 0;
+  useEffect(() => {
+    if (!hasSearch && query) {
+      setQuery("");
+    }
+  }, [hasSearch]);
 
   const doSearch = () => {
     if (canSearch) {
-      setHasSearch(true);
       performSearch(query);
     }
   };
 
   const removeSearch = () => {
-    setHasSearch(false);
     setQuery("");
     clearSearch();
   };
 
   return (
-    <div className="border-b bg-white">
+    <div className="border-b h-8 p-1 bg-white flex">
       <input
         name="search"
         title="query"
         placeholder="Search"
+        className="flex-grow"
         value={query}
         onChange={x => setQuery(x.target.value)}
       />

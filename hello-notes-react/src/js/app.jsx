@@ -3,19 +3,20 @@ import Navigation from "./components/navigation";
 import NoteList from "./components/note-list";
 import NoteViewer from "./components/note-viewer";
 import appReducer from "./app-reducer";
+import searchReducer from "./search-reducer";
 import constants from "./constants";
 import initialise from "./actions/initialise";
 
 const { VIEW } = constants;
 
 const App = () => {
-  const [state, notesDispatch] = useReducer(appReducer, []);
-  const [searchState, setSearchState] = useState(false);
+  const [notesState, notesDispatch] = useReducer(appReducer, []);
+  const [searchResults, setSearchResults] = useState(false);
   const [view, setView] = useState(VIEW.ACTIVE);
   const [isEditing, setEditing] = useState(false);
 
   useEffect(() => {
-    initialise(data => notesDispatch({ type: "initialise", data }))
+    initialise(data => notesDispatch({ type: "initialise", data }));
   }, []);
 
   const selectNote = id => {
@@ -28,6 +29,9 @@ const App = () => {
   };
 
   const createNote = note => {
+    if (!note.title) {
+      note.title = "Note title";
+    }
     const opts = {
       method: "POST",
       headers: {
@@ -58,7 +62,7 @@ const App = () => {
   };
 
   const deleteNote = () => {
-    const { id, folder } = state.current;
+    const { id, folder } = notesState.current;
     if (folder === VIEW.DELETED) {
       const opts = {
         method: "DELETE"
@@ -91,7 +95,7 @@ const App = () => {
   };
 
   const restoreNote = () => {
-    const { id } = state.current;
+    const { id } = notesState.current;
     const opts = {
       method: "PATCH",
       headers: {
@@ -117,17 +121,17 @@ const App = () => {
     fetch(constants.SERVER_ROOT + `/?search=${encodeURIComponent(query)}`, opts)
       .then(response => response.json())
       .then(data => {
-        setSearchState(data);
+        setSearchResults(data);
         setView(VIEW.SEARCH);
       });
-  }
+  };
 
   const clearSearch = () => {
-    setSearchState(false);
+    setSearchResults(false);
     setView(VIEW.ACTIVE);
-  }
+  };
 
-  const currentNotes = (state.notes || [])
+  const currentNotes = (notesState.notes || [])
     .filter(n => n.folder === view)
     .sort((a, b) => b.date - a.date);
 
@@ -137,20 +141,21 @@ const App = () => {
         newNote={createDraft}
         view={view}
         onChange={change => {
-          setSearchState(false);
+          setSearchResults(false);
           setView(change);
         }}
       />
       <NoteList
-        notes={searchState || currentNotes}
-        selected={state.current}
+        notes={searchResults || currentNotes}
+        selected={notesState.current}
         view={view}
         openNote={id => selectNote(id)}
+        hasSearch={!!searchResults}
         performSearch={performSearch}
         clearSearch={clearSearch}
       />
       <NoteViewer
-        note={state.current}
+        note={notesState.current}
         isEditing={isEditing}
         deleteNote={deleteNote}
         editNote={() => setEditing(true)}

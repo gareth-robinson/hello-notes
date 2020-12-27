@@ -15,14 +15,23 @@ const titles = {
   [VIEW.ACTIVE]: "Notes",
   [VIEW.DELETED]: "Deleted",
   [VIEW.SEARCH]: "Search Results"
-}
+};
 
 const NoteList = props => {
-  const { notes = [], view, openNote, selected, performSearch, clearSearch } = props;
+  const {
+    notes = [],
+    view,
+    openNote,
+    selected,
+    hasSearch,
+    performSearch,
+    clearSearch
+  } = props;
 
   function renderNote(note) {
     const { id, title, synopsis, date, category } = note;
-    const border = selected.id === id ? "border-green-300" : "border-gray-400";
+    const border =
+      selected && selected.id === id ? "border-green-300" : "border-gray-400";
     const categoryStyle = categoryStyles[category] || "bg-white";
     const day = dayjs(date);
 
@@ -58,7 +67,9 @@ const NoteList = props => {
       <div className="border-b h-8 p-1 bg-white">{titles[view]}</div>
       <SearchBar
         performSearch={performSearch}
-        clearSearch={clearSearch}/>
+        clearSearch={clearSearch}
+        hasSearch={hasSearch}
+      />
       <div className="overflow-y-scroll">{notes.map(renderNote)}</div>
     </div>
   );

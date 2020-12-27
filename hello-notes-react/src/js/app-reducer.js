@@ -12,7 +12,7 @@ function appReducer(state, action) {
       const newNote = {
         id: uuid(),
         date: new Date().getTime(),
-        title: "New note",
+        title: "",
         body: "",
         isNew: true
       };
