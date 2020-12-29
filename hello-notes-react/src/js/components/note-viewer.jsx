@@ -58,7 +58,7 @@ const bodyArea = (props, state, noteDispatch) => {
     />
   ) : (
     <div
-      className="note-viewer text-xs"
+      className="note-viewer text-xs p-3"
       dangerouslySetInnerHTML={{ __html: state.content }}
     />
   );
@@ -156,13 +156,17 @@ const NoteViewer = props => {
     </>
   );
 
+  const bodyClass = isEditing
+    ? "flex-1 overflow-hidden"
+    : "flex-1 overflow-y-scroll";
+
   return (
     <div className="flex-1 flex flex-col">
       <div className="border-b border-gray-400 flex">
         <div className="flex-grow h-8">{titleArea(props)}</div>
         <div className="actions">{actions}</div>
       </div>
-      <div className="flex-1">{bodyArea(props, state, noteDispatch)}</div>
+      <div className={bodyClass}>{bodyArea(props, state, noteDispatch)}</div>
       <PopUp
         visible={purge}
         title="Delete note"
