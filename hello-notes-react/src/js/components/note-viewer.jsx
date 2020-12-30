@@ -120,6 +120,15 @@ const NoteViewer = props => {
     noteDispatch({ type: "initialise", data: note });
   }, [note && note.id]);
 
+  if (note && note.noMatch) {
+    return (
+      <div className="flex-1 flex justify-center items-center">
+        <div className="text-xs">
+          Note has not been found. It may have been deleted.
+        </div>
+      </div>
+    );
+  }
   if (!note || !note.id) {
     return <div className="flex-1"></div>;
   }

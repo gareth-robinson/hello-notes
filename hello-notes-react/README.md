@@ -16,6 +16,13 @@ TODO (no particular order)
 9. Change API id to URI
 10. Category editor / categories from API
 11. Responsive UI
-12. History API
-13. No note selected
-14. Fix quill editor styling && size (inner scroll) <--
+12. History API - use initial path id
+13. No note selected - include Add button
+
+
+BUGS
+
+1. Changing note while editing leaves things in a wonky state
+- prevent note change / throw up save dialog?
+2. New notes do not work with history
+- new note to create a new server entry?

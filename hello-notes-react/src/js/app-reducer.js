@@ -42,7 +42,7 @@ function appReducer(state, action) {
     case "selectNote":
       return {
         ...state,
-        current: notes.find(x => x.id === action.id)
+        current: notes.find(x => x.id === action.id) || { noMatch: true }
       };
     default:
       return state;

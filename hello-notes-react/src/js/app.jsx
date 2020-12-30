@@ -1,4 +1,5 @@
 import React, { useReducer, useState, useEffect } from "react";
+import { createBrowserHistory } from "history";
 import Navigation from "./components/navigation";
 import NoteList from "./components/note-list";
 import NoteViewer from "./components/note-viewer";
@@ -7,6 +8,7 @@ import constants from "./constants";
 import initialise from "./actions/initialise";
 
 const { VIEW } = constants;
+const history = createBrowserHistory();
 
 const App = () => {
   const [notesState, notesDispatch] = useReducer(appReducer, []);
@@ -14,12 +16,25 @@ const App = () => {
   const [view, setView] = useState(VIEW.ACTIVE);
   const [isEditing, setEditing] = useState(false);
 
+  const selectFromPath = pathname => {
+    const id = /\/(.*)/.exec(pathname);
+    if (id[1]) {
+      notesDispatch({ type: "selectNote", id: id[1] });
+    }
+  };
+
   useEffect(() => {
     initialise(data => notesDispatch({ type: "initialise", data }));
+    history.listen(({ action, location }) => {
+      if (action === "POP") {
+        selectFromPath(location.pathname);
+      }
+    });
   }, []);
 
   const selectNote = id => {
     notesDispatch({ type: "selectNote", id });
+    history.push("/" + id);
   };
 
   const createDraft = () => {
