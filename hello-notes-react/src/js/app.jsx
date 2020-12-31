@@ -32,20 +32,19 @@ const App = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (notesState.notes) {
+      selectFromPath(window.location.pathname);
+    }
+  }, [!!notesState.notes]);
+
   const selectNote = id => {
     notesDispatch({ type: "selectNote", id });
     history.push("/" + id);
   };
 
-  const createDraft = () => {
-    notesDispatch({ type: "createDraft" });
-    setEditing(true);
-  };
-
-  const createNote = note => {
-    if (!note.title) {
-      note.title = "Note title";
-    }
+  const createNewNote = () => {
+    const note = { title: "New note" };
     const opts = {
       method: "POST",
       headers: {
@@ -56,7 +55,11 @@ const App = () => {
     };
     fetch(constants.SERVER_ROOT + `/`, opts)
       .then(response => response.json())
-      .then(data => notesDispatch({ type: "addNote", data }));
+      .then(data => {
+        notesDispatch({ type: "addNote", data });
+        setEditing(true);
+        history.push("/" + data.id);
+      });
     setEditing(false);
   };
 
@@ -152,7 +155,7 @@ const App = () => {
   return (
     <>
       <Navigation
-        newNote={createDraft}
+        newNote={createNewNote}
         view={view}
         onChange={change => {
           setSearchResults(false);
@@ -173,9 +176,7 @@ const App = () => {
         isEditing={isEditing}
         deleteNote={deleteNote}
         editNote={() => setEditing(true)}
-        saveNote={note => {
-          note.isNew ? createNote(note) : saveNote(note);
-        }}
+        saveNote={saveNote}
         restoreNote={restoreNote}
         cancelEdit={cancelEdit}
       />

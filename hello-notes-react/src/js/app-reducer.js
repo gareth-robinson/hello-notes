@@ -1,5 +1,3 @@
-import uuid from "uuid";
-
 function appReducer(state, action) {
   const { notes, current } = state;
   switch (action.type) {
@@ -8,20 +6,8 @@ function appReducer(state, action) {
         notes: action.data,
         current: action.data && action.data[0]
       };
-    case "createDraft":
-      const newNote = {
-        id: uuid(),
-        date: new Date().getTime(),
-        title: "",
-        body: "",
-        isNew: true
-      };
-      return {
-        ...state,
-        current: newNote
-      };
     case "addNote":
-      const newNotes = [].concat(state.notes).concat(action.data);
+      const newNotes = [].concat(action.data).concat(state.notes);
       return {
         notes: newNotes,
         current: action.data
