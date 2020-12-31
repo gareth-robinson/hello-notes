@@ -5,8 +5,13 @@ import NoteList from "./components/note-list";
 import NoteViewer from "./components/note-viewer";
 import appReducer from "./app-reducer";
 import constants from "./constants";
-import initialise from "./actions/initialise";
-import { createNoteAction, updateNoteAction, deleteNoteAction, performSearchAction } from "./actions";
+import {
+  initialiseAction,
+  createNoteAction,
+  updateNoteAction,
+  deleteNoteAction,
+  performSearchAction
+} from "./actions";
 
 const { VIEW } = constants;
 const history = createBrowserHistory();
@@ -24,9 +29,12 @@ const App = () => {
     }
   };
 
-  useEffect(async () => {
-    const data = await initialise();
-    notesDispatch({ type: "initialise", data })
+  useEffect(() => {
+    (async function () {
+      const data = await initialiseAction();
+      notesDispatch({ type: "initialise", data });
+    })();
+
     history.listen(({ action, location }) => {
       if (action === "POP") {
         selectFromPath(location.pathname);
@@ -64,7 +72,7 @@ const App = () => {
     const { id, folder } = note;
     if (folder === VIEW.DELETED) {
       await deleteNoteAction(note);
-      notesDispatch({ type: "deleteNote", id })
+      notesDispatch({ type: "deleteNote", id });
       setEditing(false);
     } else {
       const update = {
