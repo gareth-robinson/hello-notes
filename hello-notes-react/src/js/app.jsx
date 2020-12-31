@@ -6,6 +6,7 @@ import NoteViewer from "./components/note-viewer";
 import appReducer from "./app-reducer";
 import constants from "./constants";
 import initialise from "./actions/initialise";
+import { createNoteAction, updateNoteAction, deleteNoteAction, performSearchAction } from "./actions";
 
 const { VIEW } = constants;
 const history = createBrowserHistory();
@@ -23,8 +24,9 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    initialise(data => notesDispatch({ type: "initialise", data }));
+  useEffect(async () => {
+    const data = await initialise();
+    notesDispatch({ type: "initialise", data })
     history.listen(({ action, location }) => {
       if (action === "POP") {
         selectFromPath(location.pathname);
@@ -43,67 +45,35 @@ const App = () => {
     history.push("/" + id);
   };
 
-  const createNewNote = () => {
+  const createNewNote = async () => {
     const note = { title: "New note" };
-    const opts = {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json"
-      },
-      body: JSON.stringify(note)
-    };
-    fetch(constants.SERVER_ROOT + `/`, opts)
-      .then(response => response.json())
-      .then(data => {
-        notesDispatch({ type: "addNote", data });
-        setEditing(true);
-        history.push("/" + data.id);
-      });
+    const data = await createNoteAction(note);
+    notesDispatch({ type: "addNote", data });
+    setEditing(true);
+    history.push("/" + data.id);
+  };
+
+  const saveNote = async note => {
+    const data = await updateNoteAction(note);
+    notesDispatch({ type: "replaceNote", data });
     setEditing(false);
   };
 
-  const saveNote = note => {
-    const opts = {
-      method: "PATCH",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json"
-      },
-      body: JSON.stringify(note)
-    };
-    fetch(constants.SERVER_ROOT + `/${note.id}`, opts)
-      .then(response => response.json())
-      .then(data => notesDispatch({ type: "replaceNote", data }));
-    setEditing(false);
-  };
-
-  const deleteNote = () => {
-    const { id, folder } = notesState.current;
+  const deleteNote = async () => {
+    const note = notesState.current;
+    const { id, folder } = note;
     if (folder === VIEW.DELETED) {
-      const opts = {
-        method: "DELETE"
-      };
+      await deleteNoteAction(note);
+      notesDispatch({ type: "deleteNote", id })
       setEditing(false);
-      fetch(constants.SERVER_ROOT + `/${id}`, opts).then(() =>
-        notesDispatch({ type: "deleteNote", id })
-      );
     } else {
-      const opts = {
-        method: "PATCH",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          id,
-          folder: VIEW.DELETED
-        })
+      const update = {
+        id,
+        folder: VIEW.DELETED
       };
+      const data = await updateNoteAction(update);
+      notesDispatch({ type: "replaceNote", data });
       setEditing(false);
-      fetch(constants.SERVER_ROOT + `/${id}`, opts)
-        .then(response => response.json())
-        .then(data => notesDispatch({ type: "replaceNote", data }));
     }
   };
 
@@ -111,36 +81,20 @@ const App = () => {
     setEditing(false);
   };
 
-  const restoreNote = () => {
-    const { id } = notesState.current;
-    const opts = {
-      method: "PATCH",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        id,
-        folder: VIEW.ACTIVE
-      })
+  const restoreNote = async () => {
+    const note = notesState.current;
+    const update = {
+      id: note.id,
+      folder: VIEW.ACTIVE
     };
-    fetch(constants.SERVER_ROOT + `/${id}`, opts)
-      .then(response => response.json())
-      .then(data => notesDispatch({ type: "replaceNote", data }));
+    const data = await updateNoteAction(update);
+    notesDispatch({ type: "replaceNote", data });
   };
 
-  const performSearch = query => {
-    const opts = {
-      headers: {
-        accept: "application/json"
-      }
-    };
-    fetch(constants.SERVER_ROOT + `/?search=${encodeURIComponent(query)}`, opts)
-      .then(response => response.json())
-      .then(data => {
-        setSearchResults(data);
-        setView(VIEW.SEARCH);
-      });
+  const performSearch = async query => {
+    const data = await performSearchAction(query);
+    setSearchResults(data);
+    setView(VIEW.SEARCH);
   };
 
   const clearSearch = () => {

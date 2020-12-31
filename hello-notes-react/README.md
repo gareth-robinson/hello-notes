@@ -17,6 +17,7 @@ TODO (no particular order)
 10. Category editor / categories from API
 11. Responsive UI
 12. No note selected - include Add button
+13. Error handling for actions
 
 
 BUGS
