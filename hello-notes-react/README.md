@@ -9,15 +9,13 @@ TODO (no particular order)
 2. custom tailwind border style?
 3. tailwind production css reduction
 4. enzyme vs. react-testing-library
-5. locale bundle
-6. 'this note is deleted' message for items in trash <--
-7. extract reducers / extract actions
-8. husky / pre-commit prettier
-9. Change API id to URI
-10. Category editor / categories from API
-11. Responsive UI
-12. No note selected - include Add button
-13. Error handling for actions
+5. locale bundle <--
+6. Note time in note viewer <--
+7. husky / pre-commit prettier
+8. Change API id to URI
+9. Category editor / categories from API
+10. Responsive UI
+11. Error handling for actions
 
 
 BUGS

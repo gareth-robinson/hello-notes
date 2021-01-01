@@ -1,37 +1,13 @@
 import React, { useEffect, useReducer, useState } from "react";
-import cloneDeep from "clone-deep";
 import CategoryChooser from "./category-chooser";
 import CategoryIcon from "./category-icon";
 import NoteEditor from "./note-editor";
+import noteReducer from "./note-viewer-reducer";
 import PopUp from "./popup";
 import constants from "../constants";
 const { VIEW } = constants;
 
 const titleRef = React.createRef();
-
-function noteReducer(state, action) {
-  switch (action.type) {
-    case "initialise":
-      return action.data ? cloneDeep(action.data) : {};
-    case "setBody":
-      return {
-        ...state,
-        content: action.data
-      };
-    case "setCategory":
-      return {
-        ...state,
-        category: action.data
-      };
-    case "setTitle":
-      return {
-        ...state,
-        title: action.data
-      };
-    default:
-      return state;
-  }
-}
 
 const titleArea = props => {
   const { note, isEditing } = props;
@@ -119,19 +95,6 @@ const NoteViewer = props => {
   useEffect(() => {
     noteDispatch({ type: "initialise", data: note });
   }, [note && note.id]);
-
-  if (note && note.noMatch) {
-    return (
-      <div className="flex-1 flex justify-center items-center">
-        <div className="text-xs">
-          Note has not been found. It may have been deleted.
-        </div>
-      </div>
-    );
-  }
-  if (!note || !note.id) {
-    return <div className="flex-1"></div>;
-  }
 
   const deleteAction = () => {
     if (note.folder === VIEW.DELETED && !purge) {
