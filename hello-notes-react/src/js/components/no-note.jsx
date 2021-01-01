@@ -1,4 +1,5 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 
 const NoNote = props => {
   const { note, newNote } = props;
@@ -6,7 +7,7 @@ const NoNote = props => {
     return (
       <div className="flex-1 flex flex-col justify-center items-center">
         <div className="text-xs pb-2">
-          Note has not been found. It may have been deleted.
+          <FormattedMessage id="note.not-found" />
         </div>
         <div className="text-xs">
           <button
