@@ -1,23 +1,15 @@
 import React from "react";
+import { useIntl } from "react-intl";
 import SearchBar from "./search-bar";
 import constants from "../constants";
+import { categoryToBackgroundColour } from "../utils/category-as-style";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-
 const { VIEW } = constants;
-const categoryStyles = {
-  red: "bg-red-400",
-  green: "bg-green-400",
-  blue: "bg-blue-400"
-};
-const titles = {
-  [VIEW.ACTIVE]: "Notes",
-  [VIEW.DELETED]: "Deleted",
-  [VIEW.SEARCH]: "Search Results"
-};
 
 const NoteList = props => {
+  const intl = useIntl();
   const {
     notes = [],
     view,
@@ -28,11 +20,24 @@ const NoteList = props => {
     clearSearch
   } = props;
 
+  let title;
+  switch (view) {
+    case VIEW.ACTIVE:
+      title = intl.formatMessage({ id: "navigation.notes" });
+      break;
+    case VIEW.DELETED:
+      title = intl.formatMessage({ id: "navigation.trash" });
+      break;
+    case VIEW.DELETED:
+      title = intl.formatMessage({ id: "navigation.search-results" });
+      break;
+  }
+
   function renderNote(note) {
     const { id, title, synopsis, date, category } = note;
     const border =
       selected && selected.id === id ? "border-green-300" : "border-gray-400";
-    const categoryStyle = categoryStyles[category] || "bg-white";
+    const categoryStyle = categoryToBackgroundColour(category);
     const day = dayjs(date);
 
     return (
@@ -64,7 +69,7 @@ const NoteList = props => {
 
   return (
     <div className="w-64 border-r border-gray-400 flex flex-col bg-gray-100">
-      <div className="border-b h-8 p-1 bg-white">{titles[view]}</div>
+      <div className="border-b h-8 p-1 bg-white">{title}</div>
       <SearchBar
         performSearch={performSearch}
         clearSearch={clearSearch}

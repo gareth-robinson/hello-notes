@@ -16,9 +16,10 @@ TODO (no particular order)
 9. Category editor / categories from API
 10. Responsive UI
 11. Error handling for actions
-
+12. Isomorphism
 
 BUGS
 
 1. Changing note while editing leaves things in a wonky state
 - prevent note change / throw up save dialog?
+2. Quill 'add link' in the wrong place

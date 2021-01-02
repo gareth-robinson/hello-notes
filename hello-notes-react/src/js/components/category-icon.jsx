@@ -1,15 +1,10 @@
 import React from "react";
-
-const styles = {
-  red: "text-red-400",
-  green: "text-green-400",
-  blue: "text-blue-400"
-};
+import { categoryToTextColour } from "../utils/category-as-style";
 
 const CategoryIcon = props => {
   const { category } = props;
   const icon = category ? "turned_in" : "turned_in_not";
-  const style = "material-icons " + styles[category];
+  const style = "material-icons " + categoryToTextColour(category);
   return <i className={style}>{icon}</i>;
 };
 

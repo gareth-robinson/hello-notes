@@ -1,4 +1,5 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 
 const PopUp = props => {
   const { visible, title, text, onContinue, onCancel } = props;
@@ -21,7 +22,7 @@ const PopUp = props => {
             className="inline-flex justify-center w-full"
             onClick={onContinue}
           >
-            Continue
+            <FormattedMessage id="popup.continue" />
           </button>
         </span>
         <span className="flex w-full">
@@ -30,7 +31,7 @@ const PopUp = props => {
             className="inline-flex justify-center w-full"
             onClick={onCancel}
           >
-            Cancel
+            <FormattedMessage id="popup.cancel" />
           </button>
         </span>
       </div>
