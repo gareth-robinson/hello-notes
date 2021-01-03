@@ -1,32 +1,111 @@
 import React, { useEffect, useReducer, useState } from "react";
+import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import CategoryChooser from "./category-chooser";
 import CategoryIcon from "./category-icon";
 import NoteEditor from "./note-editor";
 import noteReducer from "./note-viewer-reducer";
 import PopUp from "./popup";
 import constants from "../constants";
+
 const { VIEW } = constants;
-
 const titleRef = React.createRef();
+const buttons = defineMessages({
+  "note-viewer.restore": {
+    id: "note-viewer.restore",
+    defaultMessage: "Restore"
+  },
+  "note-viewer.cancel": {
+    id: "note-viewer.cancel",
+    defaultMessage: "Cancel changes"
+  },
+  "note-viewer.delete": {
+    id: "note-viewer.delete",
+    defaultMessage: "Delete note"
+  },
+  "note-viewer.edit": {
+    id: "note-viewer.edit",
+    defaultMessage: "Edit"
+  },
+  "note-viewer.save": {
+    id: "note-viewer.save",
+    defaultMessage: "Save"
+  }
+});
 
-const titleArea = props => {
-  const { note, isEditing } = props;
-  return isEditing ? (
+const NoteViewer = props => {
+  const [state, noteDispatch] = useReducer(noteReducer, {});
+  const purgeState = useState(false);
+  const intl = useIntl();
+  const [purge, setPurge] = purgeState;
+  const {
+    note,
+    cancelEdit,
+    editNote,
+    deleteNote,
+    restoreNote,
+    saveNote,
+    isEditing
+  } = props;
+
+  useEffect(() => {
+    noteDispatch({ type: "initialise", data: note });
+  }, [note && note.id]);
+
+  const makeButton = (messageId, icon, onClick) => {
+    const { defaultMessage } = buttons[messageId];
+    return (
+      <button
+        title={intl.formatMessage({ id: messageId, defaultMessage })}
+        onClick={onClick}
+      >
+        <i className="material-icons">{icon}</i>
+      </button>
+    );
+  };
+
+  const deleteAction = () => {
+    if (note.folder === VIEW.DELETED && !purge) {
+      setPurge(true);
+    } else {
+      deleteNote();
+      setPurge(false);
+    }
+  };
+
+  const saveAction = () => {
+    const newVersion = {
+      id: note.id,
+      title: titleRef.current.value,
+      content: state.content,
+      category: state.category
+    };
+    saveNote(newVersion);
+  };
+
+  const restoreButton = () =>
+    makeButton("note-viewer.restore", "cached", restoreNote);
+  const cancelButton = () =>
+    makeButton("note-viewer.cancel", "clear", cancelEdit);
+  const editButton = () => makeButton("note-viewer.edit", "edit", editNote);
+  const saveButton = () => makeButton("note-viewer.save", "done", saveAction);
+  const deleteButton = makeButton("note-viewer.delete", "delete", deleteAction);
+
+  const titleArea = isEditing ? (
     <input
       type="text"
       ref={titleRef}
       defaultValue={note.title}
-      placeholder="Note title"
+      placeholder={intl.formatMessage({
+        id: "note-viewer.title-placeholder",
+        defaultMessage: "Note title"
+      })}
       className="w-full border border-green-300"
     />
   ) : (
     note.title
   );
-};
 
-const bodyArea = (props, state, noteDispatch) => {
-  const { isEditing, setNewBody } = props;
-  return isEditing ? (
+  const bodyArea = isEditing ? (
     <NoteEditor
       key={state.id}
       body={state.content}
@@ -38,72 +117,6 @@ const bodyArea = (props, state, noteDispatch) => {
       dangerouslySetInnerHTML={{ __html: state.content }}
     />
   );
-};
-
-const saveAction = (props, state) => {
-  const { note, saveNote } = props;
-  const handleClick = () => {
-    const newVersion = {
-      id: note.id,
-      title: titleRef.current.value,
-      content: state.content,
-      category: state.category,
-      isNew: state.isNew
-    };
-    saveNote(newVersion);
-  };
-  return (
-    <button title="Save" onClick={handleClick}>
-      <i className="material-icons">done</i>
-    </button>
-  );
-};
-
-const cancelAction = props => {
-  const { note, cancelEdit } = props;
-  return (
-    <button title="Cancel" onClick={cancelEdit}>
-      <i className="material-icons">clear</i>
-    </button>
-  );
-};
-
-const editAction = props => {
-  const { note, editNote } = props;
-  return (
-    <button title="Edit" onClick={editNote}>
-      <i className="material-icons">edit</i>
-    </button>
-  );
-};
-
-const restoreAction = props => {
-  const { note, restoreNote } = props;
-  return (
-    <button title="Restore" onClick={restoreNote}>
-      <i className="material-icons">cached</i>
-    </button>
-  );
-};
-
-const NoteViewer = props => {
-  const [state, noteDispatch] = useReducer(noteReducer, {});
-  const purgeState = useState(false);
-  const [purge, setPurge] = purgeState;
-  const { note, deleteNote, isEditing } = props;
-
-  useEffect(() => {
-    noteDispatch({ type: "initialise", data: note });
-  }, [note && note.id]);
-
-  const deleteAction = () => {
-    if (note.folder === VIEW.DELETED && !purge) {
-      setPurge(true);
-    } else {
-      deleteNote();
-      setPurge(false);
-    }
-  };
 
   const { category } = state || {};
   const actions = (
@@ -117,14 +130,12 @@ const NoteViewer = props => {
         <CategoryIcon category={category} />
       )}
       {state.folder === VIEW.DELETED
-        ? restoreAction(props)
+        ? restoreButton()
         : isEditing
-        ? saveAction(props, state)
-        : editAction(props)}
-      {isEditing ? cancelAction(props) : null}
-      <button title="Trash" onClick={deleteAction}>
-        <i className="material-icons">delete</i>
-      </button>
+        ? saveButton()
+        : editButton()}
+      {isEditing ? cancelButton() : null}
+      {deleteButton}
     </>
   );
 
@@ -135,14 +146,21 @@ const NoteViewer = props => {
   return (
     <div className="flex-1 flex flex-col">
       <div className="border-b border-gray-400 flex">
-        <div className="flex-grow h-8">{titleArea(props)}</div>
+        <div className="flex-grow h-8">{titleArea}</div>
         <div className="actions">{actions}</div>
       </div>
-      <div className={bodyClass}>{bodyArea(props, state, noteDispatch)}</div>
+      <div className={bodyClass}>{bodyArea}</div>
       <PopUp
         visible={purge}
-        title="Delete note"
-        text="This will permanently delete the note. Do you wish to continue?"
+        title={intl.formatMessage({
+          id: "note-viewer.purge-title",
+          defaultMessage: "Delete note"
+        })}
+        text={intl.formatMessage({
+          id: "note-viewer.purge-message",
+          defaultMessage:
+            "This will permanently delete the note. Do you wish to continue?"
+        })}
         onContinue={deleteAction}
         onCancel={() => setPurge(false)}
       />

@@ -9,17 +9,26 @@ const NoNote = props => {
     return (
       <div className="flex-1 flex flex-col justify-center items-center">
         <div className="text-xs pb-2">
-          <FormattedMessage id="no-note.not-found" />
+          <FormattedMessage
+            id="no-note.not-found"
+            defaultMessage="Note has not been found. It may have been deleted."
+          />
         </div>
         <div className="text-xs">
           <button
-            title={intl.formatMessage({ id: "navigation.add" })}
+            title={intl.formatMessage({
+              id: "navigation.add",
+              defaultMessage: "Add"
+            })}
             className="border border-gray-400 rounded-sm p-1"
             onClick={newNote}
           >
             <i className="material-icons align-middle">add</i>
             <span className="leading-6 align-middle">
-              {intl.formatMessage({ id: "no-note.add-note" })}
+              {intl.formatMessage({
+                id: "no-note.add-note",
+                defaultMessage: "Add note"
+              })}
             </span>
           </button>
         </div>

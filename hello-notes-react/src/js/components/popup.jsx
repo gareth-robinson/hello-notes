@@ -22,7 +22,11 @@ const PopUp = props => {
             className="inline-flex justify-center w-full"
             onClick={onContinue}
           >
-            <FormattedMessage id="popup.continue" />
+            <FormattedMessage
+              id="popup.continue"
+              defaultMessage="Continue"
+              description="eh"
+            />
           </button>
         </span>
         <span className="flex w-full">
@@ -31,7 +35,7 @@ const PopUp = props => {
             className="inline-flex justify-center w-full"
             onClick={onCancel}
           >
-            <FormattedMessage id="popup.cancel" />
+            <FormattedMessage id="popup.cancel" defaultMessage="Cancel" />
           </button>
         </span>
       </div>

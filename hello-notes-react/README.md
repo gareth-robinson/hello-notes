@@ -17,6 +17,10 @@ TODO (no particular order)
 10. Responsive UI
 11. Error handling for actions
 12. Isomorphism
+13. How do you localise quill?
+14. Remove days and use React-intl instead
+
+How about actually testing your localistion work?
 
 BUGS
 

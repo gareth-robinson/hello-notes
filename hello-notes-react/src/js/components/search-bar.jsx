@@ -27,13 +27,19 @@ const SearchBar = props => {
     <div className="border-b h-8 p-1 bg-white flex">
       <input
         name="search"
-        placeholder={intl.formatMessage({ id: "search-bar.search" })}
+        placeholder={intl.formatMessage({
+          id: "search-bar.search",
+          defaultMessage: "Search"
+        })}
         className="flex-grow"
         value={query}
         onChange={x => setQuery(x.target.value)}
       />
       <button
-        title={intl.formatMessage({ id: "search-bar.search" })}
+        title={intl.formatMessage({
+          id: "search-bar.search",
+          defaultMessage: "Search"
+        })}
         className={canSearch ? "" : "text-gray-300"}
         onClick={doSearch}
       >
@@ -41,7 +47,10 @@ const SearchBar = props => {
       </button>
       {hasSearch ? (
         <button
-          title={intl.formatMessage({ id: "search-bar.clear" })}
+          title={intl.formatMessage({
+            id: "search-bar.clear",
+            defaultMessage: "Clear"
+          })}
           onClick={removeSearch}
         >
           <i className="material-icons">search_off</i>

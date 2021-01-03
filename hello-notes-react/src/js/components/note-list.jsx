@@ -23,13 +23,22 @@ const NoteList = props => {
   let title;
   switch (view) {
     case VIEW.ACTIVE:
-      title = intl.formatMessage({ id: "navigation.notes" });
+      title = intl.formatMessage({
+        id: "navigation.notes",
+        defaultMessage: "Notes"
+      });
       break;
     case VIEW.DELETED:
-      title = intl.formatMessage({ id: "navigation.trash" });
+      title = intl.formatMessage({
+        id: "navigation.trash",
+        defaultMessage: "Deleted notes"
+      });
       break;
     case VIEW.DELETED:
-      title = intl.formatMessage({ id: "navigation.search-results" });
+      title = intl.formatMessage({
+        id: "navigation.search-results",
+        defaultMessage: "Search results"
+      });
       break;
   }
 

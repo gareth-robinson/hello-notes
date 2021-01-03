@@ -13,21 +13,30 @@ const Navigation = props => {
   return (
     <nav className="w-12 h-full bg-app flex flex-col border-r border-gray-400">
       <button
-        title={intl.formatMessage({ id: "navigation.add" })}
+        title={intl.formatMessage({
+          id: "navigation.add",
+          defaultMessage: "Add"
+        })}
         className={buttonStyle}
         onClick={newNote}
       >
         <i className="material-icons">add</i>
       </button>
       <button
-        title={intl.formatMessage({ id: "navigation.notes" })}
+        title={intl.formatMessage({
+          id: "navigation.notes",
+          defaultMessage: "Notes"
+        })}
         className={view === VIEW.ACTIVE ? buttonStyleActive : buttonStyle}
         onClick={() => onChange(VIEW.ACTIVE)}
       >
         <i className="material-icons">description</i>
       </button>
       <button
-        title={intl.formatMessage({ id: "navigation.trash" })}
+        title={intl.formatMessage({
+          id: "navigation.trash",
+          defaultMessage: "Deleted notes"
+        })}
         className={view === VIEW.DELETED ? buttonStyleActive : buttonStyle}
         onClick={() => onChange(VIEW.DELETED)}
       >

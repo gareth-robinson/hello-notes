@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack",
     "prettier": "node_modules/.bin/prettier --write src/**",
+    "extract-en": "formatjs extract 'src/**/*.jsx' --format simple --out-file lang.json",
     "start": "webpack-dev-server --open --mode development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +23,7 @@
     "@babel/plugin-transform-runtime": "^7.12.10",
     "@babel/preset-env": "^7.8.3",
     "@babel/preset-react": "^7.8.3",
+    "@formatjs/cli": "^2.13.18",
     "autoprefixer": "^10.0.4",
     "babel-loader": "^8.0.6",
     "css-loader": "^3.4.2",
