@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "build": "webpack",
-    "prettier": "node_modules/.bin/prettier --write src/**",
-    "extract-en": "formatjs extract 'src/**/*.jsx' --format simple --out-file lang.json",
+    "prettier": "prettier --write src/** scripts/**",
+    "extract-locale": "formatjs extract 'src/**/*.jsx' --format simple | node scripts/generate-locale",
     "start": "webpack-dev-server --open --mode development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
