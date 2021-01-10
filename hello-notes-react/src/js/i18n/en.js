@@ -1,5 +1,7 @@
 module.exports = {
+  "category-chooser.remove": "Remove category",
   "navigation.add": "Add",
+  "navigation.categories": "Categories",
   "navigation.notes": "Notes",
   "navigation.search-results": "Search results",
   "navigation.trash": "Deleted notes",

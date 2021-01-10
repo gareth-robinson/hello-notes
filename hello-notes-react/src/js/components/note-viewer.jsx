@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState } from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import { defineMessages, useIntl } from "react-intl";
 import CategoryChooser from "./category-chooser";
 import CategoryIcon from "./category-icon";
 import NoteEditor from "./note-editor";

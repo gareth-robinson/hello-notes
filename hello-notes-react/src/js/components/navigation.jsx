@@ -42,6 +42,16 @@ const Navigation = props => {
       >
         <i className="material-icons">delete</i>
       </button>
+      <button
+        title={intl.formatMessage({
+          id: "navigation.categories",
+          defaultMessage: "Categories"
+        })}
+        className={view === VIEW.CATEGORIES ? buttonStyleActive : buttonStyle}
+        onClick={() => onChange(VIEW.CATEGORIES)}
+      >
+        <i className="material-icons">turned_in</i>
+      </button>
     </nav>
   );
 };

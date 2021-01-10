@@ -1,5 +1,7 @@
 module.exports = {
+  "category-chooser.remove": "yrogetac evomeR",
   "navigation.add": "ddA",
+  "navigation.categories": "seirogetaC",
   "navigation.notes": "setoN",
   "navigation.search-results": "stluser hcraeS",
   "navigation.trash": "seton deteleD",

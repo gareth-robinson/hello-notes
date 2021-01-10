@@ -1,11 +1,13 @@
 import React, { useReducer, useState, useEffect } from "react";
 import { createBrowserHistory } from "history";
 import Navigation from "./components/navigation";
+import CategoryEditor from "./components/category-editor";
 import NoteList from "./components/note-list";
 import NoteViewer from "./components/note-viewer";
 import NoNote from "./components/no-note";
 import appReducer from "./app-reducer";
 import constants from "./constants";
+import { CategoryProvider } from "./context";
 import {
   initialiseAction,
   createNoteAction,
@@ -110,20 +112,14 @@ const App = () => {
     setView(VIEW.ACTIVE);
   };
 
-  const currentNotes = (notesState.notes || [])
-    .filter(n => n.folder === view)
-    .sort((a, b) => b.date - a.date);
-
-  return (
-    <>
-      <Navigation
-        newNote={createNewNote}
-        view={view}
-        onChange={change => {
-          setSearchResults(false);
-          setView(change);
-        }}
-      />
+  let children;
+  if (view === VIEW.CATEGORIES) {
+    children = [<CategoryEditor />];
+  } else {
+    const currentNotes = (notesState.notes || [])
+      .filter(n => n.folder === view)
+      .sort((a, b) => b.date - a.date);
+    children = [
       <NoteList
         notes={searchResults || currentNotes}
         selected={note}
@@ -133,9 +129,11 @@ const App = () => {
         performSearch={performSearch}
         clearSearch={clearSearch}
       />
-      {!note || !note.id || note.noMatch ? (
-        <NoNote note={note} newNote={createNewNote} />
-      ) : (
+    ];
+    if (!note || !note.id || note.noMatch) {
+      children.push(<NoNote note={note} newNote={createNewNote} />);
+    } else {
+      children.push(
         <NoteViewer
           note={note}
           isEditing={isEditing}
@@ -145,8 +143,22 @@ const App = () => {
           restoreNote={restoreNote}
           cancelEdit={cancelEdit}
         />
-      )}
-    </>
+      );
+    }
+  }
+
+  return (
+    <CategoryProvider>
+      <Navigation
+        newNote={createNewNote}
+        view={view}
+        onChange={change => {
+          setSearchResults(false);
+          setView(change);
+        }}
+      />
+      {children}
+    </CategoryProvider>
   );
 };
 
